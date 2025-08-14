@@ -1,58 +1,100 @@
-# Url-shortner
-Url shortner website
-Boom — I’ve built you a **ready-to-run URL Shortener** with a clean web UI, JSON API, SQLite storage, and a **single-command Docker start**. Grab it here:
+# URL Shortener (FastAPI)
 
-**[Download the ZIP](sandbox:/mnt/data/url-shortener-fastapi.zip)**
+A clean, Docker-ready URL shortener with a minimalist web UI.
 
-### What’s inside
+## Features
+- Paste a long URL and get a short code like `http://127.0.0.1:8000/abc`.
+- Redirect from short code to the original URL.
+- Stores mappings in **SQLite** (`data/urlshort.db`) for persistence.
+- JSON API: `POST /api/shorten` with `{"long_url": "https://..."}` returns `{ code, short_url }`.
+- Copy button + QR code on the UI.
+- Health endpoint: `GET /health`.
 
-* **FastAPI app** with routes:
+---
 
-  * `GET /` web form (Tailwind UI)
-  * `POST /shorten` (form) → returns short link
-  * `POST /api/shorten` (JSON) → `{ code, short_url }`
-  * `GET /{code}` → redirects to original URL
-  * `GET /health` → simple health check
-* **SQLite persistence** (`data/urlshort.db`) with Base62 codes
-* **Extras for UX**: Copy button + QR code
-* **Dockerfile + docker-compose.yml** → one-command start
-* **README.md** with quick deploy notes (Render), recording tips
-* **GitHub-ready** structure with `.gitignore` and `.env.example`
-
-### How to run (during the assessment)
-
-**Option A — One command (recommended for extra credit):**
-
+## 1) One-Command Start (Docker)
 ```bash
 docker-compose up --build
 ```
+Then open: http://127.0.0.1:8000
 
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000) and test:
+> The database persists in the `data/` folder.
 
-* Paste any long URL → **Shorten**
-* Try the short link (e.g., `http://127.0.0.1:8000/abc`)
-* (Optional) Test API:
+### Environment
+- `BASE_URL` controls the base used when generating short links (defaults to `http://127.0.0.1:8000`).
+- For deployment, set `BASE_URL` to your public domain.
 
-```bash
-curl -X POST http://127.0.0.1:8000/api/shorten \
-  -H "Content-Type: application/json" \
-  -d '{"long_url": "https://example.com"}'
-```
+---
 
-**Option B — Run without Docker:**
-
+## 2) Run Locally (without Docker)
 ```bash
 python -m venv venv
 # Windows: venv\Scripts\activate
-# macOS/Linux: source venv/bin/activate
+# macOS/Linux:
+source venv/bin/activate
+
 pip install -r requirements.txt
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
+Open http://127.0.0.1:8000
 
-### What to submit in the Google Form
+---
 
-* **GitHub repo link (public)** — push the project as-is.
-* **Screen recording (1–2 min)** — demo `GET /`, create a short link, click it to show redirect, open `/health`, optionally show the curl API call.
-* **Hosted demo link (optional bonus)** — deploy with Render (instructions in README). Set `BASE_URL` to your public URL.
+## 3) API Example
+```bash
+curl -X POST http://127.0.0.1:8000/api/shorten   -H "Content-Type: application/json"   -d '{"long_url": "https://example.com"}'
+```
 
-If you want me to tweak branding, add click analytics, custom slugs, or a nicer dashboard page before you submit, say the word and I’ll ship an updated zip immediately.
+Response:
+```json
+{"code":"1","short_url":"http://127.0.0.1:8000/1"}
+```
+
+---
+
+## 4) Quick Deploy (Render free tier)
+1. Push this repo to **GitHub** (public).
+2. Create a new **Web Service** on [Render](https://render.com/), connect the repo.
+3. Runtime: **Docker** (uses the provided Dockerfile).
+4. Set `BASE_URL` env var to your Render URL (e.g., `https://your-app.onrender.com`).
+5. Save & Deploy.
+
+Alternative hosts: Railway, Fly.io, AWS Lightsail, ECS Fargate, etc.
+
+---
+
+## 5) Project Structure
+```
+url-shortener-fastapi/
+├─ app/
+│  ├─ main.py
+│  ├─ static/
+│  │  └─ script.js
+│  └─ templates/
+│     ├─ base.html
+│     └─ index.html
+├─ data/                # SQLite DB stored here
+├─ Dockerfile
+├─ docker-compose.yml
+├─ requirements.txt
+├─ .env.example
+├─ .gitignore
+└─ README.md
+```
+
+---
+
+## 6) Recording Tips (Loom / any tool, 1–2 minutes)
+- Open http://127.0.0.1:8000
+- Paste a long URL, click **Shorten**.
+- Click **Open** to show redirection works.
+- Show **/health** responding.
+- (Optional) Show `POST /api/shorten` in a tool like curl or hoppscotch/postman.
+- Stop recording; share the view-only link.
+
+---
+
+## 7) Notes
+- If a URL is shortened more than once, you’ll get the original code back (idempotent behavior).
+- Codes are Base62 of the row ID. This keeps it deterministic and fast.
+- Redirect uses status **307 Temporary Redirect** to preserve method.

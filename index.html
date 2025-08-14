@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<form action="/shorten" method="post" class="space-y-4">
+  <label class="block text-sm font-medium">Long URL</label>
+  <input name="long_url" type="url" placeholder="https://example.com/very/long/link"
+         class="w-full rounded-xl border px-4 py-3 outline-none focus:ring"
+         required />
+  <button class="px-5 py-2.5 rounded-xl bg-black text-white hover:opacity-90 active:opacity-80">
+    Shorten
+  </button>
+</form>
+
+{% if created %}
+<hr class="my-6" />
+<div class="space-y-3">
+  <div class="flex items-center gap-2">
+    <span class="text-sm text-slate-600">Your short link:</span>
+    <input id="shortLink" class="flex-1 rounded-lg border px-3 py-2" value="{{ created }}" readonly />
+    <button class="px-3 py-2 rounded-lg border" onclick="copyShort()">Copy</button>
+    <a href="{{ created }}" target="_blank" class="px-3 py-2 rounded-lg border">Open</a>
+  </div>
+  <div class="text-xs text-slate-500">
+    Base URL: {{ base_url }}
+  </div>
+  <div class="flex items-center gap-4 mt-2">
+    <img alt="QR" class="border rounded-lg"
+         src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ created | urlencode }}" />
+    <div class="text-xs text-slate-600">Scan to open on mobile.</div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>URL Shortener</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="data:," />
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <main class="max-w-3xl mx-auto p-6">
+    <header class="mb-6">
+      <h1 class="text-3xl font-bold">URL Shortener</h1>
+      <p class="text-sm text-slate-600">Paste a long URL to get a short link.</p>
+    </header>
+    <section class="bg-white rounded-2xl shadow p-6">
+      {% block content %}{% endblock %}
+    </section>
+    <footer class="mt-6 text-center text-xs text-slate-500">
+      Built with FastAPI • Docker-ready
+    </footer>
+  </main>
+  <script src="/static/script.js"></script>
+</body>
+</html>
